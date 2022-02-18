@@ -1,39 +1,24 @@
-version: '2.2'
-
+version: "3.7"
 services:
-  db:
-    image: mysql:5.7
+  api_service:
+    build: .
     restart: always
-    environment:
-      MYSQL_DATABASE: 'db'
-      # So you don't have to use root, but you can if you like
-      MYSQL_USER: 'user'
-      # You can use whatever password you like
-      MYSQL_PASSWORD: 'password'
-      # Password for root access
-      MYSQL_ROOT_PASSWORD: 'password'
-    ports:
-      # <Port exposed> : < MySQL Port running inside container>
-      - '3306:3306'
-    expose:
-      # Opens port 3306 on the container
-      - '3306'
-      # Where our data will be persisted
-    volumes:
-      - my-db:/var/lib/mysql
-  spring-mysql-api:
-    image: spring-mysql
-    environment:
-      - JAVA_OPTIONS=-Xmx512m -Xms256m
-      - SPRING_DATASOURCE_URL=jdbc:mysql://192.168.80.2:3306/db
-      #- mediaServer.objectStore.endpoint=http://onlineeducation-minio:9000
-      - APP_SLEEP=10gi # gives time for the database to boot before the application
-    restart: always
-    depends_on:
-      - db
     ports:
       - "9212:9211"
-# Names our volume
+    depends_on:
+      - mysql_db
+    command: sh -c './wait-for mysql_db:3306 -- npm start'
+  mysql_db:
+    image: "mysql:8.0"
+    restart: always
+    ports:
+      - "3307:3306"
+    volumes:
+      - app_test_db_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: app_test_db
+      MYSQL_USER: user_giash
+      MYSQL_PASSWORD: nE5kMc7JCGNqwDQM
+      MYSQL_ROOT_PASSWORD: nE5kMc7JCGNqwDQN
 volumes:
-  my-db:
-
+  app_test_db_data:
