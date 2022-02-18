@@ -13,6 +13,8 @@ services:
     restart: always
     ports:
       - "3307:3306"
+    security_opt:
+      - seccomp:unconfined
     volumes:
       - app_test_db_data:/var/lib/mysql
     environment:
